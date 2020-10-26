@@ -9,6 +9,7 @@ import pymysql as pms
 import sys
 import re
 import io
+import os
 # tfidf 모델을 로컬에 저장하기 위한 패키지
 import pickle
 
@@ -325,5 +326,5 @@ def tfidf_decode(indexes):
     vocab_strings = load('tfidf_vocab.pk')
     return np.array(vocab_strings)[indexes]
 
-
-# print(top10(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]))s--++
+os.chdir(os.path.join(os.getcwd(),"nlp"))
+print(top10([sys.argv[1], sys.argv[2]], sys.argv[3], sys.argv[4]))
