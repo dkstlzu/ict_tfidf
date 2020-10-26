@@ -9,7 +9,6 @@ import pymysql as pms
 import sys
 import re
 import io
-import os
 # tfidf 모델을 로컬에 저장하기 위한 패키지
 import pickle
 
@@ -90,7 +89,9 @@ def do(model, data_input):
     else:
         result = model.transform(data).toarray()
         # result = model.inverse_transform(data)
-    return result
+    
+    # nparray type return
+    return result[0]
     
 # pickle 패키지를 이용하여 tfidf모델을 현재 로컬폴더에 저장합니다.
 def save(model, name):
@@ -209,7 +210,6 @@ def similarity_with_db(data, case_name, method, table, Print=False):
 
     weights = []
 
-    print('db loop start')
     for ids in same_case_name_ids:
         # summary 의 경우 key_weight의 개수가 5731개이다
         # judgement의 경우 key_weight의 개수가 16594개이다
@@ -246,13 +246,11 @@ def similarity_with_db(data, case_name, method, table, Print=False):
         # 각각 판례의 tfidf분석결과의 리스트가 각각의 인덱스에 들어가므로 결론적으로 2차원 배열이 된다.
         weights.append(weight)
 
-    print('db loop finish')
-
     # matrix연산을 위해 matrix로 type을 변경
     db_data_matrix = np.matrix(weights)
 
     # 유사도를 분석
-    similarity_arr = similarity(tfidf_data, db_data_matrix, method, Print)
+    similarity_arr = similarity(np.mat(tfidf_data), db_data_matrix, method, Print)
 
     # 유사도가 높은순서대로 해당 index를 뽑아서 해당 index에 해당하는 case id를 return합니다. 
     return similarity_arr
@@ -274,13 +272,9 @@ def top10(data, case_name, method, Print=False):
     if (ids == None):
         return
 
-    print('start')
     summary_simil = similarity_with_db(data[0], case_name, method, 'Summary', Print)
-    print('summary finish')
     judgement_simil = similarity_with_db(data[1], case_name, method, 'Judgement', Print)
-    print('judgement finish')
     content_simil = similarity_with_db(data[1], case_name, method, 'Content', Print)
-    print('content finish')
     tfidf_data = do(load('tfidf_model.pk'), data[0] + data[1])
 
     total_simil = summary_simil + judgement_simil + content_simil
@@ -326,5 +320,3 @@ def tfidf_decode(indexes):
     vocab_strings = load('tfidf_vocab.pk')
     return np.array(vocab_strings)[indexes]
 
-os.chdir(os.path.join(os.getcwd(),"nlp"))
-print(top10([sys.argv[1], sys.argv[2]], sys.argv[3], sys.argv[4]))
