@@ -9,6 +9,7 @@ import pymysql as pms
 import sys
 import re
 import io
+import json
 # tfidf 모델을 로컬에 저장하기 위한 패키지
 import pickle
 
@@ -283,10 +284,9 @@ def top10(data, case_name, method, Print=False):
 
     result = {}
     result['keywords'] = []
-    result['keywords'].append(tfidf_decode(find_indexes(tfidf_data)))
-    result['ids'] = (total_descent_ids[:10], total_descent_simil[:10] * 100)
-    return result
-        
+    result['keywords'].append(list(tfidf_decode(list(find_indexes(tfidf_data)))[:10]))
+    result['ids'] = (list(map(int, total_descent_ids[:10])), list(total_descent_simil[:10] * 100))
+    return json.dumps(result)        
 def find_ids(case_name):
     cursor = db_cursor()
     sql = ('select ID from ict.Precedent where caseName Like "%'
