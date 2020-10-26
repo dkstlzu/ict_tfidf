@@ -282,10 +282,25 @@ def top10(data, case_name, method, Print=False):
     total_descent_simil = np.sort(total_simil)[:][::-1]
     total_descent_ids = np.array(ids)[np.argsort(total_simil)[:][::-1]]
 
+    temp_arr = list(total_descent_simil[:10] * 100)
+    similarity_string = []
+    similarity_boundary = [5,10,20,25]
+    for simil in temp_arr:
+        if (simil < similarity_boundary[0]):
+            similarity_string.append("매우낮음")
+        elif (simil < similarity_boundary[1]):
+            similarity_string.append("낮음")
+        elif (simil < similarity_boundary[2]):
+            similarity_string.append("적당함")
+        elif (simil < similarity_boundary[3]):
+            similarity_string.append("높음")
+        else:
+            similarity_string.append("매우높음")
+
     result = {}
     result['keywords'] = []
     result['keywords'].append(list(tfidf_decode(list(find_indexes(tfidf_data)))[:10]))
-    result['ids'] = (list(map(int, total_descent_ids[:10])), list(total_descent_simil[:10] * 100))
+    result['ids'] = (list(map(int, total_descent_ids[:10])), similarity_string)
     return json.dumps(result)        
 def find_ids(case_name):
     cursor = db_cursor()
