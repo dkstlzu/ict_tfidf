@@ -301,11 +301,14 @@ def top10(data, case_name, method, Print=False):
     result['keywords'] = []
     result['keywords'].append(list(tfidf_decode(list(find_indexes(tfidf_data)))[:10]))
     result['ids'] = (list(map(int, total_descent_ids[:10])), similarity_string)
-    return json.dumps(result)        
+    return json.dumps(result)    
+
 def find_ids(case_name):
     cursor = db_cursor()
-    sql = ('select ID from ict.Precedent where caseName Like "%'
-        + case_name + '%" or caseName Like "손해배상"')
+    if ("손해배상(공)" in case_name or "손해배상(환)" in case_name):
+        sql = 'select ID from ict.Precedent where caseName Like "%손해배상(공)%" or caseName Like "%손해배상(환)%"'
+    else:
+        sql = 'select ID from ict.Precedent where caseName Like "%' + case_name + '%"'
     cursor.execute(sql)
     same_case_name_ids = list(cursor.fetchall())
     ids = [same_case_name_ids[i][0] for i in range(len(same_case_name_ids))]
