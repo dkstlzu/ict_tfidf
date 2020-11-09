@@ -304,8 +304,7 @@ def top10(data, case_name, method, Print=False):
     return json.dumps(result)        
 def find_ids(case_name):
     cursor = db_cursor()
-    sql = ('select ID from ict.Precedent where caseName Like "%'
-        + case_name + '%" or caseName Like "손해배상"')
+    sql = ('select ID from ict.Precedent where caseName Like "%' + case_name + '%"')
     cursor.execute(sql)
     same_case_name_ids = list(cursor.fetchall())
     ids = [same_case_name_ids[i][0] for i in range(len(same_case_name_ids))]
